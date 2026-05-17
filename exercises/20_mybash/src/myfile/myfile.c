@@ -30,15 +30,11 @@ void print_elf_type(uint16_t e_type) {
 }
 
 int __cmd_myfile(const char* filename) {
-    char filepath[512];
+    char filepath[256];
     int fd;
     Elf64_Ehdr ehdr;
 
-    strncpy(filepath, filename, sizeof(filepath) - 1);
-    filepath[sizeof(filepath) - 1] = '\0';
-    if (strncmp(filepath, "/workspace/", 11) == 0) {
-      snprintf(filepath, sizeof(filepath), "/home/yyb/qemu-camp-2026-c-yuanyiboyyb/%s", filename + 11);
-    }
+    strcpy(filepath, filename);
     fflush(stdout);
     printf("filepath: %s\n", filepath);
 
