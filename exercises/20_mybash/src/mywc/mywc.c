@@ -111,12 +111,6 @@ void process_file(const char *filename) {
 }
 
 int __cmd_mywc(const char* filename) {
-  char filepath[512];
-  strncpy(filepath, filename, sizeof(filepath) - 1);
-  filepath[sizeof(filepath) - 1] = '\0';
-  if (strncmp(filepath, "/workspace/", 11) == 0) {
-    snprintf(filepath, sizeof(filepath), "/home/yyb/qemu-camp-2026-c-yuanyiboyyb/%s", filename + 11);
-  }
-  process_file(filepath);
+  process_file(filename);
   return 0;
 }
