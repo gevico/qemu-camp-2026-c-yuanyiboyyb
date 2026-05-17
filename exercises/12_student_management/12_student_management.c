@@ -19,8 +19,18 @@ int main() {
     
     for (int i = 0; i < 3; i++) 
     {
-	    // TODO: 在这里添加你的代码
-        // I AM NOT DONE
+        students[i] = malloc(sizeof(Student));
+        if (students[i] == NULL) {
+            printf("内存分配失败\n");
+            fclose(file);
+            return 1;
+        }
+        if (fscanf(file, "%19s %49s %d", students[i]->id, students[i]->name, &students[i]->age) != 3) {
+            printf("文件格式错误\n");
+            free(students[i]);
+            fclose(file);
+            return 1;
+        }
     }
     fclose(file);
     

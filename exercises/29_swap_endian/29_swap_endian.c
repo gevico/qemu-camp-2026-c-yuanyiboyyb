@@ -2,8 +2,12 @@
 #include <stdio.h>
 
 uint32_t swap_endian(uint32_t num) {
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    __asm__ volatile (
+        "bswap %0"
+        : "+r" (num)
+        :
+        : "cc"
+    );
 }
 
 int main(int argc, char* argv[]) {

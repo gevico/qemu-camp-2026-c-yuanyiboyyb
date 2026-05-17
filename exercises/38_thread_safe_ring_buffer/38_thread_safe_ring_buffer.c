@@ -20,25 +20,49 @@ typedef struct {
 } ring_buffer_t;
 
 static int rb_init(ring_buffer_t *rb, size_t capacity) {
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    pthread_mutex_init(&rb->mtx, NULL);
+    pthread_cond_init(&rb->not_full, NULL);
+    pthread_cond_init(&rb->not_empty, NULL);
+    rb->capacity = capacity;
+    rb->buf = (int*)malloc(sizeof(int)*capacity);
+    rb->count = 0;
+    rb->head = 0;
+    rb->tail = 0;
+    return 0;
 }
 
 static void rb_destroy(ring_buffer_t *rb) {
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    free(rb->buf);
+    pthread_mutex_destroy(&rb->mtx);
+    pthread_cond_destroy(&rb->not_full);
+    pthread_cond_destroy(&rb->not_empty);
 }
 
 /* 入队：满则等待 not_full */
 static void rb_push(ring_buffer_t *rb, int val) {
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    pthread_mutex_lock(&rb->mtx);
+    while(rb->count==rb->capacity){
+        pthread_cond_wait(&rb->not_full,&rb->mtx);
+    }
+    rb->buf[rb->tail] = val;
+    rb->tail=(rb->tail+1)%rb->capacity;
+    rb->count+=1;
+    pthread_mutex_unlock(&rb->mtx);
+    pthread_cond_signal(&rb->not_empty);
 }
 
 /* 出队：空则等待 not_empty */
-static int rb_pop(ring_buffer_t *rb, int *out) {
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+static int rb_pop(ring_buffer_t *rb, int *out) {    
+    pthread_mutex_lock(&rb->mtx);
+    while(rb->count==0){
+        pthread_cond_wait(&rb->not_empty,&rb->mtx);
+    }
+    *out =  rb->buf[rb->head];
+    rb->head=(rb->head+1)%rb->capacity;
+    rb->count-=1;
+    pthread_mutex_unlock(&rb->mtx);
+    pthread_cond_signal(&rb->not_full);
+    return 1;
 }
 
 typedef struct {
@@ -53,13 +77,25 @@ typedef struct {
 } consumer_arg_t;
 
 static void *producer(void *arg) {
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    producer_arg_t*p = (producer_arg_t*)arg;
+
+    for(size_t i=0;i<(p->n);i++){
+        rb_push(p->rb,p->data[i]);
+    }
+    return NULL;
 }
 
 static void *consumer(void *arg) {
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    consumer_arg_t*p = (consumer_arg_t*)arg;
+
+    for (size_t i = 0; i < p->n; i++) {
+    int out;
+    rb_pop(p->rb, &out);
+    printf("%d", out);
+    if (i + 1 < p->n) printf(",");
+}
+printf("\n");
+    return NULL;
 }
 
 int main(void) {
